@@ -29,15 +29,9 @@ app = Flask(__name__, template_folder=tmpl_dir)
 # However for the project you will need to connect to your Part 2 database in order to use the
 # data
 #
-# XXX: The URI should be in the format of: 
-#
-#     postgresql://USER:PASSWORD@w4111db.eastus.cloudapp.azure.com/username
-#
-# For example, if you had username ewu2493, password foobar, then the following line would be:
-#
-#     DATABASEURI = "postgresql://ewu2493:foobar@w4111db.eastus.cloudapp.azure.com/ewu2493"
-#
-DATABASEURI = "postgresql://acd2164:KAFBXH@w4111db.eastus.cloudapp.azure.com/acd2164"
+DATABASEURI = "sqlite:///test.db"
+#DATABASEURI = "postgresql://acd2164:KAFBXH@w4111db.eastus.cloudapp.azure.com/acd2164"
+
 
 
 #
@@ -66,7 +60,7 @@ engine.execute("""CREATE TABLE IF NOT EXISTS test (
   id serial,
   name text
 );""")
-engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
+engine.execute("""INSERT INTO test(id, name) VALUES (1, 'grace hopper'), (2, 'alan turing'), (3, 'ada lovelace');""")
 #
 # END SQLITE SETUP CODE
 #
@@ -133,10 +127,10 @@ def index():
   #
   # example of a database query
   #
-  cursor = g.conn.execute("SELECT name FROM test")
+  cursor = g.conn.execute("SELECT * FROM test")
   names = []
   for result in cursor:
-    names.append(result['name'])  # can also be accessed using result[0]
+    names.append(result)  # can also be accessed using result[0]
   cursor.close()
 
   #
@@ -185,6 +179,10 @@ def index():
 @app.route('/another')
 def another():
   return render_template("anotherfile.html")
+
+@app.route('/signup')
+def signup():
+    return render_template("signup.html")
 
 
 # Example of adding new data to the database
