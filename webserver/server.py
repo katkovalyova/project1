@@ -55,12 +55,12 @@ engine = create_engine(DATABASEURI)
 # 
 # The setup code should be deleted once you switch to using the Part 2 postgresql database
 #
-engine.execute("""DROP TABLE IF EXISTS test;""")
-engine.execute("""CREATE TABLE IF NOT EXISTS test (
-  id serial,
-  name text
+engine.execute("""DROP TABLE IF EXISTS users;""")
+engine.execute("""CREATE TABLE IF NOT EXISTS users (
+  uid text,
+  password text
 );""")
-engine.execute("""INSERT INTO test(id, name) VALUES (1, 'grace hopper'), (2, 'alan turing'), (3, 'ada lovelace');""")
+engine.execute("""INSERT INTO users(uid, password) VALUES ('aa1234', 'password'), ('xyz987', 'thisismypw'), ('ck2609', 'somethingrandom');""")
 #
 # END SQLITE SETUP CODE
 #
@@ -127,7 +127,7 @@ def index():
   #
   # example of a database query
   #
-  cursor = g.conn.execute("SELECT * FROM test")
+  cursor = g.conn.execute("SELECT * FROM users")
   names = []
   for result in cursor:
     names.append(result)  # can also be accessed using result[0]
@@ -180,7 +180,39 @@ def index():
 def another():
   return render_template("anotherfile.html")
 
-@app.route('/signup')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['uid']
+        password = request.form['password']
+        cursor = g.conn.execute('SELECT * FROM users WHERE uid = ?', username)
+        row = cursor.fetchone()
+        if row:
+            if password == row[1]:
+                return redirect('hooray')
+            #else indicate wrong password
+        #else: indicate wrong username
+    return render_template("login.html")
+
+"""
+    except:
+        print "Actual exception"
+        import traceback; traceback.print_exc()
+"""
+    #return render_template("login.html")
+
+
+@app.route('/hooray')
+def hooray():
+    """
+    if not session.get(uid):
+        abort(401)
+    """
+    return render_template("hooray.html")
+
+
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
     return render_template("signup.html")
 
@@ -189,15 +221,15 @@ def signup():
 @app.route('/add', methods=['POST'])
 def add():
   name = request.form['name']
-  g.conn.execute('INSERT INTO test VALUES (NULL, ?)', name)
+  g.conn.execute('INSERT INTO users VALUES (NULL, ?)', name)
   return redirect('/')
 
-
+"""
 @app.route('/login')
 def login():
     abort(401)
     this_is_never_executed()
-
+"""
 
 if __name__ == "__main__":
   import click
