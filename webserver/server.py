@@ -18,7 +18,7 @@ Read about it online.
 import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response
+from flask import Flask, request, render_template, g, redirect, Response, session
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -29,8 +29,8 @@ app = Flask(__name__, template_folder=tmpl_dir)
 # However for the project you will need to connect to your Part 2 database in order to use the
 # data
 #
-DATABASEURI = "sqlite:///test.db"
-#DATABASEURI = "postgresql://acd2164:KAFBXH@w4111db.eastus.cloudapp.azure.com/acd2164"
+#DATABASEURI = "sqlite:///test.db"
+DATABASEURI = "postgresql://acd2164:KAFBXH@w4111db.eastus.cloudapp.azure.com/acd2164"
 
 
 
@@ -55,12 +55,12 @@ engine = create_engine(DATABASEURI)
 # 
 # The setup code should be deleted once you switch to using the Part 2 postgresql database
 #
-engine.execute("""DROP TABLE IF EXISTS users;""")
-engine.execute("""CREATE TABLE IF NOT EXISTS users (
-  uid text,
-  password text
-);""")
-engine.execute("""INSERT INTO users(uid, password) VALUES ('aa1234', 'password'), ('xyz987', 'thisismypw'), ('ck2609', 'somethingrandom');""")
+#engine.execute("""DROP TABLE IF EXISTS users;""")
+#engine.execute("""CREATE TABLE IF NOT EXISTS users (
+#  uid text,
+#  password text
+#);""")
+#engine.execute("""INSERT INTO users(uid, password) VALUES ('aa1234', 'password'), ('xyz987', 'thisismypw'), ('ck2609', 'somethingrandom');""")
 #
 # END SQLITE SETUP CODE
 #
@@ -181,26 +181,89 @@ def another():
   return render_template("anotherfile.html")
 
 
+# KAT
+#
+# Login page checks if uid and password exist in database.
+# If yes, go to home page. If no, return to log in page
+# with error messages wrong uid or wrong password.
+#
+#
+### info of the session kept in app's memory, hashmap mapping cookie to session object
+app.config['SESSION_TYPE'] = 'memcached'
+app.config['SECRET_KEY'] = 'super secret key'
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['uid']
+        userid = request.form['uid']
         password = request.form['password']
-        cursor = g.conn.execute('SELECT * FROM users WHERE uid = ?', username)
+        try:
+            cursor = g.conn.execute(text('SELECT * FROM users WHERE userid = :name'), name = userid)
+        #cursor = g.conn.execute('SELECT * FROM users WHERE uid = ?', userid)
+        except:
+            import traceback; traceback.print_exc()
         row = cursor.fetchone()
         if row:
             if password == row[1]:
-                return redirect('hooray')
+                session['username'] = userid
+                return redirect('/home')
             #else indicate wrong password
         #else: indicate wrong username
+        cursor.close()
     return render_template("login.html")
-
 """
     except:
         print "Actual exception"
         import traceback; traceback.print_exc()
 """
-    #return render_template("login.html")
+
+#session(username)
+
+# KAT
+#
+# Sign up page checks if uid exists in database.
+# If no, add uid and password to database. If yes,
+# return to sign up page with error message used uid.
+#
+#
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        userid = request.form['uid']
+        password = request.form['password']
+        cursor = g.conn.execute(text('SELECT * FROM users WHERE userid = :name'), name = userid)
+        #cursor = g.conn.execute('SELECT * FROM users WHERE uid = ?', userid)
+        row = cursor.fetchone()
+        if not row:
+            g.conn.execute('INSERT INTO users VALUES (?, ?)', userid, password)
+            return redirect('/login')
+        #else indicate username used
+        cursor.close()
+    return render_template("signup.html")
+
+
+# KAT
+#
+#
+#
+#
+#
+#
+@app.route('/home', methods=['GET', 'POST'])
+def home():
+    try:
+        userid = session['username']
+        cursor = g.conn.execute(text('SELECT q.position, m.title FROM queue q, movies m WHERE q.userid = :name AND q.movid = m.movid ORDER BY q.position'), name = userid)
+        queue = []
+        for result in cursor:
+            queue.append(result)  # can also be accessed using result[0]
+        cursor.close()
+        context = dict(queue = queue, blabla = 'blabla', username = userid)
+    #context = dict(blabla = 'blabla')
+    except:
+        import traceback; traceback.print_exc()
+    return render_template("home.html", **context)
+
+
 
 
 @app.route('/hooray')
@@ -212,9 +275,7 @@ def hooray():
     return render_template("hooray.html")
 
 
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    return render_template("signup.html")
+
 
 
 # Example of adding new data to the database
