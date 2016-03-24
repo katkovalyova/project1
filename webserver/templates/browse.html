@@ -1,0 +1,36 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+    <p>Login: {{username}}</p>
+    <p>
+    <p>
+    <h1>Browse Away!</h1>
+  
+  
+  <p><b>Movies:</b></p><p></p>
+  
+  <div>
+      <table>
+
+      {% for title, year, length in movieList %}
+        <tr>
+          <td>{{ title }}</td><td>{{ year }}</td> <td>{{ length }}</td>
+        </tr>
+      {% endfor %}
+
+      </table>
+  </div>
+  
+
+
+</body>
+
+
+</html>

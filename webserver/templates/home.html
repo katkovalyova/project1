@@ -10,23 +10,29 @@
 <body>
     <h1>Welcome, {{username}}!</h1>
   
-  
-  <p><b>Your Queue</b></p><p></p>
+  <p><b>Your Queue:</b></p><p></p>
   
   <div>
-      {% for row in queue %}
-      <div>{{row}}</div>
+      <table>    <!-- this is to format the table nicely -->
+
+      {% for position, title in queue %}
+        <tr>
+          <td>{{ position }}</td><td>{{ title }}</td>
+        </tr>
       {% endfor %}
+
+      </table>
   </div>
   
-  <p>{{blabla}}</p>
-  <p><a href="/managestreamacc">Manage my streaming accounts.</a></p>
-  
-  <form method="POST" action="/search">
-      <p>Search: <input type="text" name="search">
-          <input type="submit" value="GO"></p>
-  </form>
-      
+
+  <p></p>    <!-- NewLine for spacing -->
+
+  <a href="rate">View Rating History</a> <!-- Link to rate.html page -->
+  <p>
+  <a href="searchHistory">View Search History</a> <!-- Link to searchHistory page -->
+  <p><b>
+  <a href="browse">Browse Movies Here!</a></b> <!-- Link to general browse page -->
+
 
 
 </body>

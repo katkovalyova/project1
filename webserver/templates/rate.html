@@ -1,0 +1,36 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+    <p>Login: {{username}}</p>
+    <p>
+    <p>
+    <h1>Here Are Your Past Ratings!</h1>
+  
+  
+  <p><b>Movies You Have Rated:</b></p><p></p>
+  
+  <div>
+      <table>
+
+      {% for title, rating in rateList %}
+        <tr>
+          <td>{{ title }}</td><td>{{ rating }}</td>
+        </tr>
+      {% endfor %}
+
+      </table>
+  </div>
+  
+
+
+</body>
+
+
+</html>

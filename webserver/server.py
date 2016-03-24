@@ -228,17 +228,20 @@ def login():
 #
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    if request.method == 'POST':
-        userid = request.form['uid']
-        password = request.form['password']
-        cursor = g.conn.execute(text('SELECT * FROM users WHERE userid = :name'), name = userid)
+    try:
+        if request.method == 'POST':
+            userid = request.form['uid']
+            password = request.form['password']
+            cursor = g.conn.execute(text('SELECT * FROM users WHERE userid = :name'), name = userid)
         #cursor = g.conn.execute('SELECT * FROM users WHERE uid = ?', userid)
-        row = cursor.fetchone()
-        if not row:
-            g.conn.execute('INSERT INTO users VALUES (:name, :pw)', name = userid, pw = password)
-            return redirect('/login')
+            row = cursor.fetchone()
+            if not row:
+                g.conn.execute('INSERT INTO users VALUES (:name[0], :pw[0])', name = userid, pw = password)
+                return redirect('/login')
         #else indicate username used
         cursor.close()
+    except:
+        import traceback; traceback.print_exc()
     return render_template("signup.html")
 
 
@@ -276,15 +279,13 @@ def home():
 #
 @app.route('/managestreamacc', methods=['GET', 'POST'])
 def managestreamacc():
-    if request.method == 'POST':
-        userid = session['username']
-        cursor = g.conn.execute(text('SELECT x.extservname, e.extaccun, e.extaccid FROM belongto b, servedby s, externalaccounts e, externalservices x where b.userid = :name AND e.extaccid = b.extaccid AND e.extaccid=s.extaccid AND x.extservid=s.extservid'), name = userid)
-        list = []
-        for row in cursor:
-            list.append(row)
-        cursor.close()
-        context = dict(username = userid, accounts = list)
-        #return redirect('/editstreamacc', **context)
+    userid = session['username']
+    cursor = g.conn.execute(text('SELECT x.extservname, e.extaccun, e.extaccid FROM belongto b, servedby s, externalaccounts e, externalservices x where b.userid = :name AND e.extaccid = b.extaccid AND e.extaccid=s.extaccid AND x.extservid=s.extservid'), name = userid)
+    list = []
+    for row in cursor:
+        list.append(row)
+    cursor.close()
+    context = dict(username = userid, accounts = list)
     return render_template("managestreamacc.html", **context)
 
 #
@@ -297,7 +298,21 @@ def managestreamacc():
 #
 @app.route('/addstreamacc', methods=['GET', 'POST'])
 def addstreamacc():
-    return render_template("/hooray.html")
+    userid = session['username']
+    cursor = g.conn.execute(text('SELECT extservname FROM externalservices'))
+    menu = []
+    for row in cursor:
+        menu.append(row)
+    cursor.close()
+    getcontext = dict(menu = menu)
+    if request.method == 'POST':
+        
+        service = request.form['service']
+        exaccun = request.form['exaccun']
+        exaccpw = request.form['exaccpw']
+    
+        cursor = g.conn.execute(text('SELECT * FROM '))
+    return render_template("/addstreamacc.html", **getcontext)
 
 
 #
@@ -327,6 +342,46 @@ def search():
         import traceback; traceback.print_exc()
     print request.args
     return render_template("/search.html", **context)
+
+
+@app.route('/searchhistory', methods=['GET', 'POST'])
+def searchhistory():
+  userid = session['username']
+  cursor1 = g.conn.execute(text('Select m.title, s.movTimeSearch FROM Movies m, searchHistory_Movies s WHERE s.userid= :name AND s.movid=m.movid ORDER BY s.movTimeSearch DESC'), name = userid)
+  searchList = []
+  searchList.append(('hello','29'))
+  for result in cursor1:
+    searchList.append((result.title, result.movTimeSearch))
+  cursor1.close()
+  # #userid = 'kivi'
+  context = dict(searchList=searchList, username = userid)
+  return render_template("searchhistory.html", **context)
+
+@app.route('/rate', methods=['GET', 'POST'])
+def rate():
+  userid = session['username']
+  cursor = g.conn.execute(text('Select m.title, r.value FROM movies m, rate r WHERE r.userid = :name AND  r.movid=m.movid ORDER BY r.value DESC'), name = userid)
+  rateList = []
+  for result in cursor:
+    rateList.append((result.title, result.value))
+  cursor.close()
+  #userid = 'kivi'
+  context = dict(rateList=rateList, username = userid)
+  return render_template("rate.html", **context) 
+
+
+
+@app.route('/browse', methods=['GET', 'POST'])
+def browse():
+  userid = session['username']
+  cursor = g.conn.execute(text('Select m.title, m.year, m.length FROM Movies m ORDER BY m.title DESC'))
+  movieList = []
+  for result in cursor:
+    movieList.append((result.title, result.year, result.length))
+  cursor.close()
+  #userid = 'kivi'
+  context = dict(movieList=movieList, username = userid)
+  return render_template("browse.html", **context)
 
 
 @app.route('/hooray')

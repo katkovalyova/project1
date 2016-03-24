@@ -1,0 +1,38 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+    <p>Login: {{username}}</p>
+    <p>
+    <p>
+    <h1>Here are movies you searched!</h1>
+  
+  
+  <p><b>Search History:</b></p><p></p>
+  
+  <div>
+      <table>
+
+      {% for title, movTimeSearch in searchList %}
+        <tr>
+          <td>{{ title }}</td><td>{{ movTimeSearch }}</td>
+
+        </tr>
+      {% endfor %}
+
+      </table>
+  </div>
+  
+  <p>here</p>
+
+
+</body>
+
+
+</html>
