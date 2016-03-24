@@ -1,0 +1,33 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+    <h1>Add a new streaming account!</h1>
+  
+  <form method="POST" action="/search">
+      
+  <select>
+      {% for row in menu %}
+      <option name="service" value="{{row[0]}}">{{row[0]}}</option>
+      {% endfor %}
+  </select>
+  
+    <p>Username: <input type="text" name="exaccun"></p>
+    <p>Password: <input type="text" name="exaccpw"></p>
+          <input type="submit" value="Create">
+              
+  </form>
+  
+      
+
+
+</body>
+
+
+</html>
