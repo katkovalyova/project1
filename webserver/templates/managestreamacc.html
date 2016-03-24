@@ -1,0 +1,31 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+    <h1>{{username}}'s Streaming Accounts!</h1>
+  
+  <div>
+      {% for row in accounts %}
+      <form method="POST" action="/editstreamacc"><div>{{row[0]}}: {{row[1]}}
+          <input type="submit" value="Edit"></div>
+      <input type="hidden" name="exaccid" value="{{row[2]}}"></form>
+      
+      {% endfor %}
+  </div>
+  
+  
+  <p><a href="/addstreamacc">Add a streaming account.</a></p>
+  
+      
+
+
+</body>
+
+
+</html>

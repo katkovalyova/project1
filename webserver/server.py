@@ -181,6 +181,7 @@ def another():
   return render_template("anotherfile.html")
 
 
+#
 # KAT
 #
 # Login page checks if uid and password exist in database.
@@ -206,7 +207,7 @@ def login():
             if password == row[1]:
                 session['username'] = userid
                 return redirect('/home')
-            #else indicate wrong password
+            #else indicate wrong password, in the form of context for login (?)
         #else: indicate wrong username
         cursor.close()
     return render_template("login.html")
@@ -216,8 +217,8 @@ def login():
         import traceback; traceback.print_exc()
 """
 
-#session(username)
 
+#
 # KAT
 #
 # Sign up page checks if uid exists in database.
@@ -234,18 +235,19 @@ def signup():
         #cursor = g.conn.execute('SELECT * FROM users WHERE uid = ?', userid)
         row = cursor.fetchone()
         if not row:
-            g.conn.execute('INSERT INTO users VALUES (?, ?)', userid, password)
+            g.conn.execute('INSERT INTO users VALUES (:name, :pw)', name = userid, pw = password)
             return redirect('/login')
         #else indicate username used
         cursor.close()
     return render_template("signup.html")
 
 
+#
 # KAT
 #
-#
-#
-#
+# Home page contains user's queue, option to edit/add
+# service accounts, view search history, search for movie/
+# artist, and log out (?)
 #
 #
 @app.route('/home', methods=['GET', 'POST'])
@@ -264,6 +266,67 @@ def home():
     return render_template("home.html", **context)
 
 
+#
+# KAT
+#
+#
+#
+#
+#
+#
+@app.route('/managestreamacc', methods=['GET', 'POST'])
+def managestreamacc():
+    if request.method == 'POST':
+        userid = session['username']
+        cursor = g.conn.execute(text('SELECT x.extservname, e.extaccun, e.extaccid FROM belongto b, servedby s, externalaccounts e, externalservices x where b.userid = :name AND e.extaccid = b.extaccid AND e.extaccid=s.extaccid AND x.extservid=s.extservid'), name = userid)
+        list = []
+        for row in cursor:
+            list.append(row)
+        cursor.close()
+        context = dict(username = userid, accounts = list)
+        #return redirect('/editstreamacc', **context)
+    return render_template("managestreamacc.html", **context)
+
+#
+# KAT
+#
+#
+#
+#
+#
+#
+@app.route('/addstreamacc', methods=['GET', 'POST'])
+def addstreamacc():
+    return render_template("/hooray.html")
+
+
+#
+# KAT
+#
+#
+#
+#
+#
+#
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    try:
+        input = request.form['search']
+        input = '%' + input + '%'
+        
+    
+        cursor = g.conn.execute(text('SELECT title FROM movies WHERE title LIKE :inpt'), inpt = input)
+
+        list = []
+        for row in cursor:
+            list.append(row)
+        cursor.close()
+
+        context = dict(input = input, movies = list)
+    except:
+        import traceback; traceback.print_exc()
+    print request.args
+    return render_template("/search.html", **context)
 
 
 @app.route('/hooray')
