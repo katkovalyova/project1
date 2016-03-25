@@ -13,7 +13,7 @@
   <div>
       {% for row in accounts %}
       <form method="POST" action="/editstreamacc"><div>{{row[0]}}: {{row[1]}}
-          <input type="submit" value="Edit"></div>
+          <input type="submit" value="Update"><input type="submit" value="Delete"></div>
       <input type="hidden" name="exaccid" value="{{row[2]}}"></form>
       
       {% endfor %}
