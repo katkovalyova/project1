@@ -377,11 +377,22 @@ def rate():
 @app.route('/browse', methods=['GET', 'POST'])
 def browse():
   userid = session['username']
-  cursor = g.conn.execute(text('Select m.title, m.year, m.length FROM Movies m ORDER BY m.title DESC'))
+  cursor = g.conn.execute(text('Select m.title, m.year, m.length FROM Movies m ORDER BY m.title ASC'))
   movieList = []
   for result in cursor:
     movieList.append((result.title, result.year, result.length))
   cursor.close()
+  
+
+  if request.method == 'POST'
+    sort = request.form['sort']
+    if sort == 'title'
+      cursor = g.conn.execute(text('Select m.title, m.year, m.length FROM Movies m ORDER BY m.title DESC'))
+      movieList = []
+      for result in cursor:
+        movieList.append((result.title, result.year, result.length))
+      cursor.close()
+
   #userid = 'kivi'
   context = dict(movieList=movieList, username = userid)
   return render_template("browse.html", **context)
