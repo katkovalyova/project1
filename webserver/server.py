@@ -299,21 +299,29 @@ def managestreamacc():
 @app.route('/addstreamacc', methods=['GET', 'POST'])
 def addstreamacc():
     userid = session['username']
-    cursor = g.conn.execute(text('SELECT extservname FROM externalservices'))
+    cursor = g.conn.execute(text('SELECT extservid, extservname FROM externalservices'))
     menu = []
     for row in cursor:
         menu.append(row)
     cursor.close()
     getcontext = dict(menu = menu)
-    if request.method == 'POST':
-        
-        service = request.form['service']
-        exaccun = request.form['exaccun']
-        exaccpw = request.form['exaccpw']
-    
-        currmaxid = g.conn.execute(text('SELECT max(extaccid) from externalaccounts'))
-        cursor = g.conn.execute(text('SELECT extaccun FROM externalaccounts WHERE extaccun = :un AND extservid = '), un = exaccun)
 
+    if request.method == 'POST':
+        try:
+          service = request.form['service']
+          exaccun = request.form['exaccun']
+          exaccpw = request.form['exaccpw']
+    
+          maxaccid = g.conn.execute(text('SELECT max(extaccid) FROM externalaccounts'))
+          servid = g.conn.execute(text('SELECT extservid FROM externalservices WHERE extservname = :serv'), serv = service)
+          cursor = g.conn.execute(text('SELECT a.extaccun FROM externalaccounts a, externalservices s WHERE a.extaccun = :un AND s.extservid = :serv'), un = exaccun, serv = servid)
+          
+          row = cursor.fetchone()
+          if not row:
+            g.conn.execute(text('INSERT INTO externalaccounts VALUES (:id+1, :un, :pw)'), id = maxaccid, un = exaccun, pw = exaccpw)
+        except:
+          import traceback; traceback.print_exc()
+        return redirect('/managestreamacc')
     return render_template("/addstreamacc.html", **getcontext)
 
 
@@ -377,21 +385,47 @@ def rate():
 @app.route('/browse', methods=['GET', 'POST'])
 def browse():
   userid = session['username']
-  cursor = g.conn.execute(text('Select m.title, m.year, m.length FROM Movies m ORDER BY m.title ASC'))
+  cursor = g.conn.execute(text('Select m.title, m.year, g.genreName FROM Movies m, CategorizedBy c, Genres g WHERE m.movid = c.movid AND c.genreid = g.genreid ORDER BY m.title ASC'))
   movieList = []
   for result in cursor:
-    movieList.append((result.title, result.year, result.length))
+    movieList.append((result.title, result.year, result[2]))
   cursor.close()
   
 
-  if request.method == 'POST'
+  if request.method == 'POST':
     sort = request.form['sort']
-    if sort == 'title'
-      cursor = g.conn.execute(text('Select m.title, m.year, m.length FROM Movies m ORDER BY m.title DESC'))
+    if sort == 'Sort By Title':
+      cursor = g.conn.execute(text('Select m.title, m.year, g.genreName FROM Movies m, CategorizedBy c, Genres g WHERE m.movid = c.movid AND c.genreid = g.genreid ORDER BY m.title ASC'))
       movieList = []
       for result in cursor:
-        movieList.append((result.title, result.year, result.length))
+        movieList.append((result.title, result.year, result[2]))
       cursor.close()
+    if sort == 'Sort By Year':
+      cursor = g.conn.execute(text('Select m.year, m.title, g.genreName FROM Movies m, CategorizedBy c, Genres g WHERE m.movid = c.movid AND c.genreid = g.genreid ORDER BY m.year'))
+      movieList = []
+      for result in cursor:
+        movieList.append((result.year, result.title, result[2]))
+      cursor.close()
+    if sort == 'Sort By Genre':
+      cursor = g.conn.execute(text('Select g.genreName, m.title, m.year FROM Movies m, CategorizedBy c, Genres g WHERE m.movid = c.movid AND c.genreid = g.genreid ORDER BY g.genreName'))
+      movieList = []
+      for result in cursor:
+        movieList.append((result[0], result.title, result.year))
+      cursor.close()
+
+  #userid = 'kivi'
+  context = dict(movieList=movieList, username = userid)
+  return render_template("browse.html", **context)
+  
+
+  # if request.method == 'POST':
+  #   sort = request.form['sort']
+  #   if sort == 'title'
+  #     cursor = g.conn.execute(text('Select m.title, m.year, m.length FROM Movies m ORDER BY m.title DESC'))
+  #     movieList = []
+  #     for result in cursor:
+  #       movieList.append((result.title, result.year, result.length))
+  #     cursor.close()
 
   #userid = 'kivi'
   context = dict(movieList=movieList, username = userid)

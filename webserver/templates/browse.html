@@ -15,13 +15,16 @@
   
   
   <p><b>Movies:</b></p><p></p>
+  <p></p>
+
+  <!-- <form method="POST" action="/browse"> --><input type="submit" name="sort" value="Sort By Title"><input type="submit" name="sort" value="Sort By Year"><input type="submit" name="sort" value="Sort By Genre"></form> 
   
   <div>
       <table>
 
-      {% for title, year, length in movieList %}
+      {% for title, year, genreName in movieList %}
         <tr>
-          <td>{{ title }}</td><td>{{ year }}</td> <td>{{ length }}</td>
+          <td>{{ title }}</td><td>{{ year }}</td><td>{{ genreName }}</td> 
         </tr>
       {% endfor %}
 
