@@ -236,10 +236,10 @@ def signup():
         #cursor = g.conn.execute('SELECT * FROM users WHERE uid = ?', userid)
             row = cursor.fetchone()
             if not row:
-                g.conn.execute('INSERT INTO users VALUES (:name[0], :pw[0])', name = userid, pw = password)
+                g.conn.execute(text('INSERT INTO users VALUES (:name, :pw)'), name = userid, pw = password)
                 return redirect('/login')
         #else indicate username used
-        cursor.close()
+            cursor.close()
     except:
         import traceback; traceback.print_exc()
     return render_template("signup.html")
@@ -356,6 +356,7 @@ def searchhistory():
   # #userid = 'kivi'
   context = dict(searchList=searchList, username = userid)
   return render_template("searchhistory.html", **context)
+
 
 @app.route('/rate', methods=['GET', 'POST'])
 def rate():
