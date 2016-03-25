@@ -311,7 +311,9 @@ def addstreamacc():
         exaccun = request.form['exaccun']
         exaccpw = request.form['exaccpw']
     
-        cursor = g.conn.execute(text('SELECT * FROM '))
+        currmaxid = g.conn.execute(text('SELECT max(extaccid) from externalaccounts'))
+        cursor = g.conn.execute(text('SELECT extaccun FROM externalaccounts WHERE extaccun = :un AND extservid = '), un = exaccun)
+
     return render_template("/addstreamacc.html", **getcontext)
 
 
