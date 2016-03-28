@@ -339,15 +339,32 @@ def search():
         input = request.form['search']
         input = '%' + input + '%'
         
-    
         cursor = g.conn.execute(text('SELECT title FROM movies WHERE title LIKE :inpt'), inpt = input)
-
-        list = []
+        movlist = []
         for row in cursor:
-            list.append(row)
+            movlist.append(row)
         cursor.close()
 
-        context = dict(input = input, movies = list)
+        cursor = g.conn.execute(text('SELECT artistfirstname, artistlastname FROM artists WHERE artistfirstname LIKE :inpt OR artistlastname LIKE :inpt'), inpt = input)
+        artlist = []
+        for row in cursor:
+            artlist.append(row)
+        cursor.close()
+
+        cursor = g.conn.execute(text('SELECT genrename FROM genres WHERE genrename LIKE :inpt'), inpt = input)
+        genlist = []
+        for row in cursor:
+            genlist.append(row)
+        cursor.close()
+
+        cursor = g.conn.execute(text('SELECT awardname, year FROM awards WHERE awardname LIKE :inpt OR category LIKE :inpt OR role LIKE :inpt OR artist LIKE :inpt'), inpt = input)
+        awlist = []
+        for row in cursor:
+            awlist.append(row)
+        cursor.close()
+
+        context = dict(input = input, movies = movlist, artists = artlist, genres = genlist, awards = awlist)
+
     except:
         import traceback; traceback.print_exc()
     print request.args
@@ -417,19 +434,6 @@ def browse():
   context = dict(movieList=movieList, username = userid)
   return render_template("browse.html", **context)
   
-
-  # if request.method == 'POST':
-  #   sort = request.form['sort']
-  #   if sort == 'title'
-  #     cursor = g.conn.execute(text('Select m.title, m.year, m.length FROM Movies m ORDER BY m.title DESC'))
-  #     movieList = []
-  #     for result in cursor:
-  #       movieList.append((result.title, result.year, result.length))
-  #     cursor.close()
-
-  #userid = 'kivi'
-  context = dict(movieList=movieList, username = userid)
-  return render_template("browse.html", **context)
 
 
 @app.route('/hooray')

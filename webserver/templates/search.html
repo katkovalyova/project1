@@ -10,32 +10,48 @@
 <body>
     <h1>"{{input}}"</h1>
     
-    <p> Movies <p>
+    <p><b> Movies </b><p>
     <div>
-        {% for row in movies %}
-        {{row}}
-        {% endfor %}
+        <table>    <!-- this is to format the table nicely -->
+            {% for row in movies %}
+            <tr>
+                <td>{{ row[0] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
     
-    <p> Artists <p>
+    <p><b> Artists </b><p>
     <div>
-        {% for row in artists %}
-        {{row}}
-        {% endfor %}
+        <table>    <!-- this is to format the table nicely -->
+            {% for row in artists %}
+            <tr>
+                <td>{{ row[0] }} {{ row[1] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
     
-    <p> Genres <p>
+    <p><b> Genres </b><p>
     <div>
-        {% for row in genres %}
-        {{row}}
-        {% endfor %}
+        <table>    <!-- this is to format the table nicely -->
+            {% for row in genres %}
+            <tr>
+                <td>{{ row[0] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
     
-    <p> Awards <p>
+    <p><b> Awards </b><p>
     <div>
-        {% for row in awards %}
-        {{row}}
-        {% endfor %}
+        <table>    <!-- this is to format the table nicely -->
+            {% for row in awards %}
+            <tr>
+                <td>{{ row[0] }}, {{ row[1] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
   
   <div>
