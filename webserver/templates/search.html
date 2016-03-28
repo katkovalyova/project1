@@ -8,7 +8,7 @@
 
 
 <body>
-    <h1>"{{input}}"</h1>
+    <h1>Search: "{{originput}}"</h1>
     
     <p><b> Movies </b><p>
     <div>
@@ -16,6 +16,7 @@
             {% for row in movies %}
             <tr>
                 <td>{{ row[0] }}</td>
+                <input type="hidden" name="movid" value="{{row[1]}}">
             </tr>
             {% endfor %}
         </table>
@@ -27,6 +28,7 @@
             {% for row in artists %}
             <tr>
                 <td>{{ row[0] }} {{ row[1] }}</td>
+                <input type="hidden" name="artid" value="{{row[2]}}">
             </tr>
             {% endfor %}
         </table>
@@ -38,6 +40,7 @@
             {% for row in genres %}
             <tr>
                 <td>{{ row[0] }}</td>
+                <input type="hidden" name="genid" value="{{row[1]}}">
             </tr>
             {% endfor %}
         </table>
@@ -49,6 +52,7 @@
             {% for row in awards %}
             <tr>
                 <td>{{ row[0] }}, {{ row[1] }}</td>
+                <input type="hidden" name="exacc" value="{{row[2]}}">
             </tr>
             {% endfor %}
         </table>
@@ -60,10 +64,6 @@
       {% endfor %}
   </div>
   
-  
-  <p><a href="/addstreamacc">Add a streaming account.</a></p>
-  
-      
 
 
 </body>

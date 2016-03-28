@@ -336,34 +336,34 @@ def addstreamacc():
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     try:
-        input = request.form['search']
-        input = '%' + input + '%'
+        originput = request.form['search']
+        input = '%' + originput + '%'
         
-        cursor = g.conn.execute(text('SELECT title FROM movies WHERE title LIKE :inpt'), inpt = input)
+        cursor = g.conn.execute(text('SELECT title, movid FROM movies WHERE title LIKE :inpt'), inpt = input)
         movlist = []
         for row in cursor:
             movlist.append(row)
         cursor.close()
 
-        cursor = g.conn.execute(text('SELECT artistfirstname, artistlastname FROM artists WHERE artistfirstname LIKE :inpt OR artistlastname LIKE :inpt'), inpt = input)
+        cursor = g.conn.execute(text('SELECT artistfirstname, artistlastname, artistid FROM artists WHERE artistfirstname LIKE :inpt OR artistlastname LIKE :inpt'), inpt = input)
         artlist = []
         for row in cursor:
             artlist.append(row)
         cursor.close()
 
-        cursor = g.conn.execute(text('SELECT genrename FROM genres WHERE genrename LIKE :inpt'), inpt = input)
+        cursor = g.conn.execute(text('SELECT genrename, genreid FROM genres WHERE genrename LIKE :inpt'), inpt = input)
         genlist = []
         for row in cursor:
             genlist.append(row)
         cursor.close()
 
-        cursor = g.conn.execute(text('SELECT awardname, year FROM awards WHERE awardname LIKE :inpt OR category LIKE :inpt OR role LIKE :inpt OR artist LIKE :inpt'), inpt = input)
+        cursor = g.conn.execute(text('SELECT DISTINCT awardname, year FROM awards WHERE awardname LIKE :inpt OR category LIKE :inpt OR role LIKE :inpt OR artist LIKE :inpt'), inpt = input)
         awlist = []
         for row in cursor:
             awlist.append(row)
         cursor.close()
 
-        context = dict(input = input, movies = movlist, artists = artlist, genres = genlist, awards = awlist)
+        context = dict(originput = originput, movies = movlist, artists = artlist, genres = genlist, awards = awlist)
 
     except:
         import traceback; traceback.print_exc()
