@@ -280,11 +280,22 @@ def home():
 @app.route('/managestreamacc', methods=['GET', 'POST'])
 def managestreamacc():
     userid = session['username']
+
+    # if manage == 'Delete':
+    #   try:
+    #     exaccid = request.form['exaccid']
+    #     g.conn.execute(text('DELETE FROM externalaccounts WHERE extaccid = :eid'), eid = exaccid)
+    #   except:
+    #       import traceback; traceback.print_exc()
+      #return redirect('/managestreamacc')
+
+    #userid = session['username']
     cursor = g.conn.execute(text('SELECT x.extservname, e.extaccun, e.extaccid FROM belongto b, servedby s, externalaccounts e, externalservices x where b.userid = :name AND e.extaccid = b.extaccid AND e.extaccid=s.extaccid AND x.extservid=s.extservid'), name = userid)
     list = []
     for row in cursor:
         list.append(row)
     cursor.close()
+
     context = dict(username = userid, accounts = list)
     return render_template("managestreamacc.html", **context)
 
@@ -308,22 +319,46 @@ def addstreamacc():
 
     if request.method == 'POST':
         try:
-          service = request.form['service']
+          service = request.form['service'] 
           exaccun = request.form['exaccun']
           exaccpw = request.form['exaccpw']
     
           maxaccid = g.conn.execute(text('SELECT max(extaccid) FROM externalaccounts'))
+          mid = maxaccid.fetchone()[0]
           servid = g.conn.execute(text('SELECT extservid FROM externalservices WHERE extservname = :serv'), serv = service)
-          cursor = g.conn.execute(text('SELECT a.extaccun FROM externalaccounts a, externalservices s WHERE a.extaccun = :un AND s.extservid = :serv'), un = exaccun, serv = servid)
-          
+          sid = servid.fetchone();
+          cursor = g.conn.execute(text('SELECT a.extaccun FROM externalaccounts a, externalservices s WHERE a.extaccun = :un AND s.extservid = :serv'), un = exaccun, serv = sid)
+
           row = cursor.fetchone()
           if not row:
-            g.conn.execute(text('INSERT INTO externalaccounts VALUES (:id+1, :un, :pw)'), id = maxaccid, un = exaccun, pw = exaccpw)
+            g.conn.execute(text('INSERT INTO externalaccounts VALUES (:id+1, :un, :pw)'), id = mid, un = exaccun, pw = exaccpw)
+            g.conn.execute(text('INSERT INTO servedby VALUES(:id+1, :serv)'), id = mid, serv = sid)
+          cursor.close()
         except:
           import traceback; traceback.print_exc()
         return redirect('/managestreamacc')
     return render_template("/addstreamacc.html", **getcontext)
 
+
+
+@app.route('/editstreamacc', methods=['POST'])
+def editstreamacc():
+  try:
+    userid = session['username']
+    exaccid = request.form['exaccid']
+    manage = request.form['manage']
+    if manage == 'Delete':   
+      g.conn.execute(text('DELETE FROM externalaccounts WHERE extaccid = :eid'), eid = exaccid)
+    if manage == 'Update':
+      g.conn.execute(text(''))
+
+
+    
+    #exaccid = request.form['exaccid']
+    #g.conn.execute(text('DELETE FROM externalaccounts WHERE extaccid = :eid'), eid = exaccid)
+  except:
+          import traceback; traceback.print_exc()
+  return redirect('/managestreamacc')
 
 #
 # KAT
@@ -371,6 +406,22 @@ def search():
     return render_template("/search.html", **context)
 
 
+
+@app.route('/watchhistory', methods=['GET', 'POST'])
+def watchhistory():
+  try:
+    userid = session['username']
+    cursor = g.conn.execute(text('SELECT m.title, w.datewatched, x.extservname FROM movies m, watched w, externalaccounts e, externalservices x, servedby s, belongto b WHERE m.movid = w.movid AND w.extaccid = e.extaccid AND e.extaccid = b.extaccid AND e.extaccid = s.extaccid AND x.extservid = s.extservid AND b.userid = :username ORDER BY w.datewatched ASC'), username = userid)
+    watchlist = []
+    for row in cursor:
+      watchlist.append(row)
+    cursor.close()
+    context = dict(watchlist = watchlist, username = userid)
+  except:
+    import traceback; traceback.print_exc()
+  return render_template("watchhistory.html", **context)
+
+
 @app.route('/searchhistory', methods=['GET', 'POST'])
 def searchhistory():
   userid = session['username']
@@ -382,7 +433,7 @@ def searchhistory():
   cursor1.close()
   # #userid = 'kivi'
   context = dict(searchList=searchList, username = userid)
-  return render_template("searchhistory.html", **context)
+  return render_template("searchHistory.html", **context)
 
 
 @app.route('/rate', methods=['GET', 'POST'])

@@ -1,0 +1,36 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+    <p>Login: {{username}}</p>
+    <p>
+    <p>
+    <!-- <h1>Here are movies you have watched!</h1> -->
+  
+  
+  <p><b>Watch History:</b></p><p></p>
+  
+  <div>
+      <table>
+
+      {% for row in watchlist %}
+        <tr>
+          <td>{{ row[1] }} </td><td>{{ row[0] }} </td><td>{{ row[2] }}</td>
+
+        </tr>
+      {% endfor %}
+
+      </table>
+  </div>
+  
+
+</body>
+
+
+</html>
