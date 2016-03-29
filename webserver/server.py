@@ -335,7 +335,8 @@ def addstreamacc():
           row = cursor.fetchone()
           if not row:
             g.conn.execute(text('INSERT INTO externalaccounts VALUES (:id+1, :un, :pw)'), id = mid, un = exaccun, pw = exaccpw)
-            g.conn.execute(text('INSERT INTO servedby VALUES(:id+1, :serv)'), id = mid, serv = service)
+            g.conn.execute(text('INSERT INTO servedby VALUES (:id+1, :serv)'), id = mid, serv = service)
+            g.conn.execute(text('INSERT INTO belongto VALUES (:uid, :id+1)'), uid = userid, id = mid)
           cursor.close()
         except:
           import traceback; traceback.print_exc()
