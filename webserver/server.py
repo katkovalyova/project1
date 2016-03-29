@@ -562,19 +562,26 @@ def movieinfo():
 
 @app.route('/artistinfo', methods=['GET', 'POST'])
 def artistinfo():
-  userid = session['username']
-  print "hello"
-  artistinfoList = []
+  try:
+    userid = session['username']
+    print "hello"
+    artistinfoList = []
 
-  artistid = request.args.get('artistid')
+    artistid = request.args.get('artistid')
+    #print "artistid = %s\n" % artistid
 
-  cursor = g.conn.execute(text('Select a.artistfirstName, a.artistlastname, a.DOB, a.artistid from Artists a WHERE a.artistid= :artistid'), artistid = artistid)
+    cursor = g.conn.execute(text('Select a.artistfirstName, a.artistlastname, a.DOB, a.artistid from Artists a WHERE a.artistid= :artistid'), artistid = artistid)
 
-  for result in cursor:
-    artistinfoList.append((result.artistfirstName, result.artistlastname, result.DOB, result.artistid))  
-  cursor.close()
+    for result in cursor:
+      artistinfoList.append((result.artistfirstname, result.artistlastname, result.dob, result.artistid))  
+    cursor.close()
+
+  except:
+    import traceback; traceback.print_exc()
 
   context = dict(artistinfoList=artistinfoList, username = userid)
+  
+
   return render_template("artistinfo.html", **context)
   
 
