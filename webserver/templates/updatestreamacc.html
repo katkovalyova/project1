@@ -10,12 +10,13 @@
 <body>
     <h1>Update this streaming account!</h1>
     
+    <form method="POST" action="/replacestreamacc">
     <p>{{ esname[0] }}</p>
     <p>{{ exaccid[0] }}</p>
     <input type="hidden" name="exaccid" value="{{ exaccid[0] }}">
     <input type="hidden" name="esname" value="{{ esname[0] }}">
   
-  <form method="POST" action="/replacestreamacc">
+  
   
     <p>Username: <input type="text" name="exaccun"></p>
     <p>Password: <input type="text" name="exaccpw"></p>
@@ -23,7 +24,9 @@
               
   </form>
   
-  
+  <p><p><p>
+  <p><a href="/home">Back to home.</a></p>
+  <p> <form method="POST" action="/logout"><input type="submit" value="Logout"></p></form>
 
 
 </body>

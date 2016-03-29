@@ -13,16 +13,19 @@
     <p>
     <h1>Movie Information</h1>
 
-  <p><b>Movie: </b></p><p></p>
+{% for title, year, length, imdbrating in movieinfoList %}
+  <p><b>Movie: <a href="movieinfo?movid={{movid}}">{{title}}</a></b></p><p></p>
   <p></p>
+
 
     <div>
       <table>
 
-      {% for title, year, length, imdbrating in movieinfoList %}
-        <tr>
-          <td><a href="movieinfo?movid={{movid}}">{{title}}</a></td><td>{{ year }}</td><td>{{ length }}</td><td>{{ imdbrating }}</td>
-        </tr>
+
+        <!-- <tr><td>Title: <a href="movieinfo?movid={{movid}}">{{title}}</a></td></tr> -->
+        <tr><td>Year: {{ year }}</td></tr>
+        <tr><td>Length: {{ length }} minutes</td></tr>
+        <tr><td>IMDb Rating {{ imdbrating }}</td></tr>
       {% endfor %}
 
       </table>
