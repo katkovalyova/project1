@@ -319,26 +319,36 @@ def addstreamacc():
 
     if request.method == 'POST':
         try:
-          service = request.form['service'] 
+          service = request.form['service']
+          #print "service = %d \n" % service
           exaccun = request.form['exaccun']
           exaccpw = request.form['exaccpw']
     
           maxaccid = g.conn.execute(text('SELECT max(extaccid) FROM externalaccounts'))
           mid = maxaccid.fetchone()[0]
-          servid = g.conn.execute(text('SELECT extservid FROM externalservices WHERE extservname = :serv'), serv = service)
-          sid = servid.fetchone();
-          cursor = g.conn.execute(text('SELECT a.extaccun FROM externalaccounts a, externalservices s WHERE a.extaccun = :un AND s.extservid = :serv'), un = exaccun, serv = sid)
+          #servid = g.conn.execute(text('SELECT extservid FROM externalservices WHERE extservid = 201'), serv = service)
+          #print "servid = %s \n" % servid
+          #sid = servid.fetchone();
+          #print "sid = %s \n" % sid
+          cursor = g.conn.execute(text('SELECT a.extaccun FROM externalaccounts a, externalservices s WHERE a.extaccun = :un AND s.extservid = :serv'), un = exaccun, serv = service)
 
           row = cursor.fetchone()
           if not row:
             g.conn.execute(text('INSERT INTO externalaccounts VALUES (:id+1, :un, :pw)'), id = mid, un = exaccun, pw = exaccpw)
-            g.conn.execute(text('INSERT INTO servedby VALUES(:id+1, :serv)'), id = mid, serv = sid)
+            g.conn.execute(text('INSERT INTO servedby VALUES(:id+1, :serv)'), id = mid, serv = service)
           cursor.close()
         except:
           import traceback; traceback.print_exc()
         return redirect('/managestreamacc')
     return render_template("/addstreamacc.html", **getcontext)
 
+
+@app.route('/deletestreamacc', methods=['GET', 'POST'])
+def deletestreamacc():
+    userid = session['username']
+    exaccid = request.form['exaccid']
+    g.conn.execute(text('DELETE FROM externalaccounts WHERE extaccid = :eid'), eid = exaccid)
+    return redirect('/managestreamacc')
 
 
 @app.route('/editstreamacc', methods=['POST'])
@@ -349,16 +359,44 @@ def editstreamacc():
     manage = request.form['manage']
     if manage == 'Delete':   
       g.conn.execute(text('DELETE FROM externalaccounts WHERE extaccid = :eid'), eid = exaccid)
+      return redirect('/managestreamacc')
     if manage == 'Update':
-      g.conn.execute(text(''))
+      cursor = g.conn.execute(text('SELECT x.extservname FROM servedby s, externalservices x where s.extaccid = :eid and s.extservid = x.extservid'), eid = exaccid)
+      esname = cursor.fetchone()
+      context = dict(exaccid = exaccid, esname = esname)
+      return render_template("/updatestreamacc.html", **context)
+      #g.conn.execute(text('UPDATE externalaccounts SET extaccun = 'testupdate', extaccpw = 'testupdate1' where extaccid = 16'))
 
-
-    
     #exaccid = request.form['exaccid']
     #g.conn.execute(text('DELETE FROM externalaccounts WHERE extaccid = :eid'), eid = exaccid)
   except:
           import traceback; traceback.print_exc()
   return redirect('/managestreamacc')
+
+
+@app.route('/replacestreamacc', methods=['GET', 'POST'])
+def replacestreamacc():
+  try:
+    print "in function\n"
+    userid = session['username']
+    print "userid %s \n" % userid
+    exaccid = request.form['exaccid']
+    print "exaccid %d \n" % exaccid
+    esname = request.form['esname']
+    print "esname %s \n" % esname
+
+    exaccun = request.form['exaccun']
+    print "exaccun %s \n" % exaccun
+    exaccpw = request.form['exaccpw']
+    print "exaccpw %s \n" % exaccpw
+    
+
+    g.conn.execute(text('UPDATE externalaccounts SET extaccun = :eun, extaccpw = :pw where extaccid = :un'), eun = exaccun, pw = exaccpw, un = userid)
+  except:
+    import traceback; traceback.print_exc()
+  return redirect('/managestreamacc')
+  
+
 
 #
 # KAT
