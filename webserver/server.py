@@ -330,7 +330,7 @@ def addstreamacc():
           #print "servid = %s \n" % servid
           #sid = servid.fetchone();
           #print "sid = %s \n" % sid
-          cursor = g.conn.execute(text('SELECT a.extaccun FROM externalaccounts a, externalservices s WHERE a.extaccun = :un AND s.extservid = :serv'), un = exaccun, serv = service)
+          cursor = g.conn.execute(text('SELECT a.extaccun FROM externalaccounts a, servedby s WHERE a.extaccun = :un AND a.extaccid = s.extaccid AND s.extservid = :serv'), un = exaccun, serv = service)
 
           row = cursor.fetchone()
           if not row:
@@ -380,19 +380,19 @@ def replacestreamacc():
   try:
     print "in function\n"
     userid = session['username']
-    print "userid %s \n" % userid
+    #print "userid %s \n" % userid
     exaccid = request.form['exaccid']
-    print "exaccid %d \n" % exaccid
+    #print "exaccid %d \n" % exaccid
     esname = request.form['esname']
-    print "esname %s \n" % esname
+    #print "esname %s \n" % esname
 
     exaccun = request.form['exaccun']
-    print "exaccun %s \n" % exaccun
+    #print "exaccun %s \n" % exaccun
     exaccpw = request.form['exaccpw']
-    print "exaccpw %s \n" % exaccpw
+    #print "exaccpw %s \n" % exaccpw
     
 
-    g.conn.execute(text('UPDATE externalaccounts SET extaccun = :eun, extaccpw = :pw where extaccid = :un'), eun = exaccun, pw = exaccpw, un = userid)
+    g.conn.execute(text('UPDATE externalaccounts SET extaccun = :eun, extaccpw = :pw where extaccid = :id'), eun = exaccun, pw = exaccpw, id = exaccid)
   except:
     import traceback; traceback.print_exc()
   return redirect('/managestreamacc')
