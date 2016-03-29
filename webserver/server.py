@@ -207,7 +207,13 @@ def login():
             if password == row[1]:
                 session['username'] = userid
                 return redirect('/home')
+            else:
+              context = dict(error = "Incorrect password")
+              return render_template("login.html", **context)
             #else indicate wrong password, in the form of context for login (?)
+        else:
+            context = dict(error = "Incorrect username")
+            return render_template("login.html", **context)
         #else: indicate wrong username
         cursor.close()
     return render_template("login.html")
@@ -238,6 +244,9 @@ def signup():
             if not row:
                 g.conn.execute(text('INSERT INTO users VALUES (:name, :pw)'), name = userid, pw = password)
                 return redirect('/login')
+            else:
+              context = dict(error = "Username already exists")
+              return render_template("signup.html", **context)
         #else indicate username used
             cursor.close()
     except:
