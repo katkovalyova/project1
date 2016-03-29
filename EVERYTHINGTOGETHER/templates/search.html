@@ -1,0 +1,56 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+    <h1>"{{input}}"</h1>
+    
+    <p> Movies <p>
+    <div>
+        {% for row in movies %}
+        {{row}}
+        {% endfor %}
+    </div>
+    
+    <p> Artists <p>
+    <div>
+        {% for row in artists %}
+        {{row}}
+        {% endfor %}
+    </div>
+    
+    <p> Genres <p>
+    <div>
+        {% for row in genres %}
+        {{row}}
+        {% endfor %}
+    </div>
+    
+    <p> Awards <p>
+    <div>
+        {% for row in awards %}
+        {{row}}
+        {% endfor %}
+    </div>
+  
+  <div>
+      {% for row in accounts %}
+      <form method="POST" action="/addstreamacc"><div>{{row}} <input type="submit" value="Edit"></div></form>
+      {% endfor %}
+  </div>
+  
+  
+  <p><a href="/addstreamacc">Add a streaming account.</a></p>
+  
+      
+
+
+</body>
+
+
+</html>

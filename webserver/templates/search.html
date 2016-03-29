@@ -15,7 +15,7 @@
         <table>    <!-- this is to format the table nicely -->
             {% for row in movies %}
             <tr>
-                <td>{{ row[0] }}</td>
+                <td><a href="movieinfo?movid={{row[1]}}">{{ row[0] }}</a></td>
                 <input type="hidden" name="movid" value="{{row[1]}}">
             </tr>
             {% endfor %}
@@ -60,7 +60,7 @@
   
   <div>
       {% for row in accounts %}
-      <form method="POST" action="/addstreamacc"><div>{{row}} <input type="submit" value="Edit"></div></form>
+      <!-- <form method="POST" action="/addstreamacc"> --><div>{{row}} <input type="submit" value="Edit"></div></form>
       {% endfor %}
   </div>
   

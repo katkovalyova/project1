@@ -17,23 +17,46 @@
   <p><b>Movies:</b></p><p></p>
   <p></p>
 
-  <form method="POST" action="/browse">
-      
-  <input type="submit" name="sort" value="Sort By Title"><input type="submit" name="sort" value="Sort By Year"><input type="submit" name="sort" value="Sort By Genre"></form>
-  
+
+   <form method="POST" action="/browse"> <input type="submit" name="sort" value="Sort By Title"><input type="submit" name="sort" value="Sort By Year"><input type="submit" name="sort" value="Sort By Genre"></form>
+
   <div>
       <table>
-
-      {% for title, year, genreName in movieList %}
+      {% for title, year, genreName, movid in movieList %}
         <tr>
-          <td>{{ title }}</td><td>{{ year }}</td><td>{{ genreName }}</td> 
+          <td><a href="movieinfo?movid={{movid}}">{{title}}</a></td><td>{{ year }}</td><td>{{ genreName }}</td>
         </tr>
       {% endfor %}
-
       </table>
-  </div>
-  
 
+      <table>
+      {% for title, year, genreName, movid in movieList1 %}
+        <tr>
+          <td><a href="movieinfo?movid={{movid}}">{{title}}</a></td><td>{{ year }}</td><td>{{ genreName }}</td>
+        </tr>
+      {% endfor %}
+      </table>
+
+      <table>
+      {% for year, title, genreName, movid in movieList2 %}
+        <tr>
+          </td><td>{{ year }}</td><td><a href="movieinfo?movid={{movid}}">{{title}}</a><td>{{ genreName }}</td>
+          <input type="hidden" name="movid" value="movieid"/>
+        </tr>
+      {% endfor %}
+      </table>    
+
+      <table>
+      {% for genreName, title, year, movid in movieList3 %}
+        <tr>
+          <td>{{ genreName }}</td><td><a href="movieinfo?movid={{movid}}">{{title}}</a></td><td>{{ year }}</td>
+          <input type="hidden" name="movid" value="movieid"/>
+        </tr>
+      {% endfor %}
+      </table>
+
+  </div>
+   
 
 </body>
 

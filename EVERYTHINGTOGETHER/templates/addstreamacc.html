@@ -12,10 +12,9 @@
   
   <form method="POST" action="/addstreamacc">
       
-  <select name = "service">
+  <select>
       {% for row in menu %}
-      <option value="{{row[0]}}">{{row[1]}}</option>
-      
+      <option name="service" value="{{row[0]}}">{{row[0]}}</option>
       {% endfor %}
   </select>
   

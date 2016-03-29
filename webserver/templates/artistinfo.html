@@ -1,0 +1,27 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+    <p>Login: {{username}}</p>
+    <p>
+    <p>
+    <h1>Artist Information</h1>
+
+  <p><b>Artist: </b></p><p></p>
+  <p></p>
+    <div>
+      <p>Artist Name, Date of Birth, and ArtistID</p><p></p>
+      <table>
+      {% for artistfirstName, artistlastName, DOB, artistid in artistinfoList %}
+        <tr>
+          <td><a href="artistinfo?artistid={{artistid}}">{{artistfirstName}}</a></td><td>{{ artistlastName }}</td><td>{{ DOB }}</td>
+        </tr>
+      {% endfor %}
+      </table>
+  </div>

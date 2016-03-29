@@ -11,23 +11,25 @@
     <p>Login: {{username}}</p>
     <p>
     <p>
-    <h1>Here Are Your Past Ratings!</h1>
+    <h1>Here are movies you searched!</h1>
   
   
-  <p><b>Movies You Have Rated:</b></p><p></p>
+  <p><b>Search History:</b></p><p></p>
   
   <div>
       <table>
 
-      {% for title, rating, movid in rateList %}
+      {% for title, movTimeSearch in searchList %}
         <tr>
-          <td><a href="movieinfo?movid={{movid}}">{{title}}</a></td><td>:</td><td>{{ rating }}</td>
+          <td>{{ title }}</td><td>{{ movTimeSearch }}</td>
+
         </tr>
       {% endfor %}
 
       </table>
   </div>
   
+  <p>here</p>
 
 
 </body>

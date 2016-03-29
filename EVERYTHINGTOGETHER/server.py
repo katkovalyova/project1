@@ -236,10 +236,10 @@ def signup():
         #cursor = g.conn.execute('SELECT * FROM users WHERE uid = ?', userid)
             row = cursor.fetchone()
             if not row:
-                g.conn.execute(text('INSERT INTO users VALUES (:name, :pw)'), name = userid, pw = password)
+                g.conn.execute('INSERT INTO users VALUES (:name[0], :pw[0])', name = userid, pw = password)
                 return redirect('/login')
         #else indicate username used
-            cursor.close()
+        cursor.close()
     except:
         import traceback; traceback.print_exc()
     return render_template("signup.html")
@@ -257,7 +257,7 @@ def signup():
 def home():
     try:
         userid = session['username']
-        cursor = g.conn.execute(text('SELECT q.position, m.title, m.movid FROM queue q, movies m WHERE q.userid = :name AND q.movid = m.movid ORDER BY q.position'), name = userid)
+        cursor = g.conn.execute(text('SELECT q.position, m.title FROM queue q, movies m WHERE q.userid = :name AND q.movid = m.movid ORDER BY q.position'), name = userid)
         queue = []
         for result in cursor:
             queue.append(result)  # can also be accessed using result[0]
@@ -280,22 +280,11 @@ def home():
 @app.route('/managestreamacc', methods=['GET', 'POST'])
 def managestreamacc():
     userid = session['username']
-
-    # if manage == 'Delete':
-    #   try:
-    #     exaccid = request.form['exaccid']
-    #     g.conn.execute(text('DELETE FROM externalaccounts WHERE extaccid = :eid'), eid = exaccid)
-    #   except:
-    #       import traceback; traceback.print_exc()
-      #return redirect('/managestreamacc')
-
-    #userid = session['username']
     cursor = g.conn.execute(text('SELECT x.extservname, e.extaccun, e.extaccid FROM belongto b, servedby s, externalaccounts e, externalservices x where b.userid = :name AND e.extaccid = b.extaccid AND e.extaccid=s.extaccid AND x.extservid=s.extservid'), name = userid)
     list = []
     for row in cursor:
         list.append(row)
     cursor.close()
-
     context = dict(username = userid, accounts = list)
     return render_template("managestreamacc.html", **context)
 
@@ -310,93 +299,20 @@ def managestreamacc():
 @app.route('/addstreamacc', methods=['GET', 'POST'])
 def addstreamacc():
     userid = session['username']
-    cursor = g.conn.execute(text('SELECT extservid, extservname FROM externalservices'))
+    cursor = g.conn.execute(text('SELECT extservname FROM externalservices'))
     menu = []
     for row in cursor:
         menu.append(row)
     cursor.close()
     getcontext = dict(menu = menu)
-
     if request.method == 'POST':
-        try:
-          service = request.form['service']
-          #print "service = %d \n" % service
-          exaccun = request.form['exaccun']
-          exaccpw = request.form['exaccpw']
+        
+        service = request.form['service']
+        exaccun = request.form['exaccun']
+        exaccpw = request.form['exaccpw']
     
-          maxaccid = g.conn.execute(text('SELECT max(extaccid) FROM externalaccounts'))
-          mid = maxaccid.fetchone()[0]
-          #servid = g.conn.execute(text('SELECT extservid FROM externalservices WHERE extservid = 201'), serv = service)
-          #print "servid = %s \n" % servid
-          #sid = servid.fetchone();
-          #print "sid = %s \n" % sid
-          cursor = g.conn.execute(text('SELECT a.extaccun FROM externalaccounts a, externalservices s WHERE a.extaccun = :un AND s.extservid = :serv'), un = exaccun, serv = service)
-
-          row = cursor.fetchone()
-          if not row:
-            g.conn.execute(text('INSERT INTO externalaccounts VALUES (:id+1, :un, :pw)'), id = mid, un = exaccun, pw = exaccpw)
-            g.conn.execute(text('INSERT INTO servedby VALUES (:id+1, :serv)'), id = mid, serv = service)
-            g.conn.execute(text('INSERT INTO belongto VALUES (:uid, :id+1)'), uid = userid, id = mid)
-          cursor.close()
-        except:
-          import traceback; traceback.print_exc()
-        return redirect('/managestreamacc')
+        cursor = g.conn.execute(text('SELECT * FROM '))
     return render_template("/addstreamacc.html", **getcontext)
-
-
-@app.route('/deletestreamacc', methods=['GET', 'POST'])
-def deletestreamacc():
-    userid = session['username']
-    exaccid = request.form['exaccid']
-    g.conn.execute(text('DELETE FROM externalaccounts WHERE extaccid = :eid'), eid = exaccid)
-    return redirect('/managestreamacc')
-
-
-@app.route('/editstreamacc', methods=['POST'])
-def editstreamacc():
-  try:
-    userid = session['username']
-    exaccid = request.form['exaccid']
-    manage = request.form['manage']
-    if manage == 'Delete':   
-      g.conn.execute(text('DELETE FROM externalaccounts WHERE extaccid = :eid'), eid = exaccid)
-      return redirect('/managestreamacc')
-    if manage == 'Update':
-      cursor = g.conn.execute(text('SELECT x.extservname FROM servedby s, externalservices x where s.extaccid = :eid and s.extservid = x.extservid'), eid = exaccid)
-      esname = cursor.fetchone()
-      context = dict(exaccid = exaccid, esname = esname)
-      return render_template("/updatestreamacc.html", **context)
-      #g.conn.execute(text('UPDATE externalaccounts SET extaccun = 'testupdate', extaccpw = 'testupdate1' where extaccid = 16'))
-
-    #exaccid = request.form['exaccid']
-    #g.conn.execute(text('DELETE FROM externalaccounts WHERE extaccid = :eid'), eid = exaccid)
-  except:
-          import traceback; traceback.print_exc()
-  return redirect('/managestreamacc')
-
-
-@app.route('/replacestreamacc', methods=['GET', 'POST'])
-def replacestreamacc():
-  try:
-    print "in function\n"
-    userid = session['username']
-    print "userid %s \n" % userid
-    exaccid = request.form['exaccid']
-    print "exaccid %d \n" % exaccid
-    esname = request.form['esname']
-    print "esname %s \n" % esname
-
-    exaccun = request.form['exaccun']
-    print "exaccun %s \n" % exaccun
-    exaccpw = request.form['exaccpw']
-    print "exaccpw %s \n" % exaccpw
-    
-
-    g.conn.execute(text('UPDATE externalaccounts SET extaccun = :eun, extaccpw = :pw where extaccid = :un'), eun = exaccun, pw = exaccpw, un = userid)
-  except:
-    import traceback; traceback.print_exc()
-  return redirect('/managestreamacc')
-  
 
 
 #
@@ -410,74 +326,27 @@ def replacestreamacc():
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     try:
-        originput = request.form['search']
-        input = '%' + originput + '%'
+        input = request.form['search']
+        input = '%' + input + '%'
         
-        cursor = g.conn.execute(text('SELECT title, movid FROM movies WHERE title LIKE :inpt'), inpt = input)
-        movlist = []
+    
+        cursor = g.conn.execute(text('SELECT title FROM movies WHERE title LIKE :inpt'), inpt = input)
+
+        list = []
         for row in cursor:
-            movlist.append(row)
+            list.append(row)
         cursor.close()
 
-        cursor = g.conn.execute(text('SELECT artistfirstname, artistlastname, artistid FROM artists WHERE artistfirstname LIKE :inpt OR artistlastname LIKE :inpt'), inpt = input)
-        artlist = []
-        for row in cursor:
-            artlist.append(row)
-        cursor.close()
-
-        cursor = g.conn.execute(text('SELECT genrename, genreid FROM genres WHERE genrename LIKE :inpt'), inpt = input)
-        genlist = []
-        for row in cursor:
-            genlist.append(row)
-        cursor.close()
-
-        cursor = g.conn.execute(text('SELECT DISTINCT awardname, year FROM awards WHERE awardname LIKE :inpt OR category LIKE :inpt OR role LIKE :inpt OR artist LIKE :inpt'), inpt = input)
-        awlist = []
-        for row in cursor:
-            awlist.append(row)
-        cursor.close()
-
-        context = dict(originput = originput, movies = movlist, artists = artlist, genres = genlist, awards = awlist)
-
+        context = dict(input = input, movies = list)
     except:
         import traceback; traceback.print_exc()
     print request.args
     return render_template("/search.html", **context)
 
 
-
-@app.route('/watchhistory', methods=['GET', 'POST'])
-def watchhistory():
-  try:
-    userid = session['username']
-    cursor = g.conn.execute(text('SELECT m.title, w.datewatched, x.extservname FROM movies m, watched w, externalaccounts e, externalservices x, servedby s, belongto b WHERE m.movid = w.movid AND w.extaccid = e.extaccid AND e.extaccid = b.extaccid AND e.extaccid = s.extaccid AND x.extservid = s.extservid AND b.userid = :username ORDER BY w.datewatched ASC'), username = userid)
-    watchlist = []
-    for row in cursor:
-      watchlist.append(row)
-    cursor.close()
-    context = dict(watchlist = watchlist, username = userid)
-  except:
-    import traceback; traceback.print_exc()
-  return render_template("watchhistory.html", **context)
-
-
 @app.route('/searchhistory', methods=['GET', 'POST'])
 def searchhistory():
   userid = session['username']
-  cursor = g.conn.execute(text('Select m.title, s.movTimeSearch, m.movid FROM Movies m, searchHistory_Movies s WHERE s.userid= :name AND s.movid=m.movid ORDER BY s.movTimeSearch DESC'), name = userid)
-  searchmovList = []
-  for result in cursor:
-    searchmovList.append((result.title, result[1], result[2]))
-  cursor.close()
-
-  cursor2 = g.conn.execute(text('Select a.artistfirstName, a.artistlastname, s.artTimeSearch, a.artistid FROM Artists a, searchHistory_Artists s WHERE s.userid = :name AND  s.artistid=a.artistid ORDER BY s.artTimeSearch DESC'), name = userid)
-  searchartList = []
-  for result2 in cursor2:
-    searchartList.append((result2[0]+' '+result2[1], result2[2], result2[3]))
-  cursor2.close()
-
-  context = dict(searchmovList=searchmovList, searchartList = searchartList, username = userid)
-  return render_template("searchhistory.html", **context)
   cursor1 = g.conn.execute(text('Select m.title, s.movTimeSearch FROM Movies m, searchHistory_Movies s WHERE s.userid= :name AND s.movid=m.movid ORDER BY s.movTimeSearch DESC'), name = userid)
   searchList = []
   searchList.append(('hello','29'))
@@ -486,97 +355,33 @@ def searchhistory():
   cursor1.close()
   # #userid = 'kivi'
   context = dict(searchList=searchList, username = userid)
-  return render_template("searchHistory.html", **context)
-
+  return render_template("searchhistory.html", **context)
 
 @app.route('/rate', methods=['GET', 'POST'])
 def rate():
   userid = session['username']
-  cursor = g.conn.execute(text('Select m.title, r.value, m.movid FROM movies m, rate r WHERE r.userid = :name AND  r.movid=m.movid ORDER BY r.value DESC'), name = userid)
+  cursor = g.conn.execute(text('Select m.title, r.value FROM movies m, rate r WHERE r.userid = :name AND  r.movid=m.movid ORDER BY r.value DESC'), name = userid)
   rateList = []
   for result in cursor:
-    rateList.append((result.title, result.value, result[2]))
+    rateList.append((result.title, result.value))
   cursor.close()
-  #userid = 'kivi' test 
+  #userid = 'kivi'
   context = dict(rateList=rateList, username = userid)
   return render_template("rate.html", **context) 
+
+
 
 @app.route('/browse', methods=['GET', 'POST'])
 def browse():
   userid = session['username']
-  cursor = g.conn.execute(text('Select m.title, m.year, g.genreName, m.movid FROM Movies m, CategorizedBy c, Genres g WHERE m.movid = c.movid AND c.genreid = g.genreid ORDER BY m.title ASC'))
-
+  cursor = g.conn.execute(text('Select m.title, m.year, m.length FROM Movies m ORDER BY m.title DESC'))
   movieList = []
   for result in cursor:
-    movieList.append((result.title, result.year, result[2], result[3])) 
+    movieList.append((result.title, result.year, result.length))
   cursor.close()
-  context = dict(movieList=movieList, username = userid)
-
-
-  if request.method == 'POST':
-    sort = request.form['sort']
-    if sort == 'Sort By Title':
-      cursor = g.conn.execute(text('Select m.title, m.year, g.genreName, m.movid FROM Movies m, CategorizedBy c, Genres g WHERE m.movid = c.movid AND c.genreid = g.genreid ORDER BY m.title ASC'))
-      movieList1 = []
-      for result in cursor:
-        movieList1.append((result.title, result.year, result[2], result[3]))
-      cursor.close()
-      context = dict(movieList1=movieList1, username = userid)
-
-    if sort == 'Sort By Year':
-      cursor = g.conn.execute(text('Select m.year, m.title, g.genreName, m.movid FROM Movies m, CategorizedBy c, Genres g WHERE m.movid = c.movid AND c.genreid = g.genreid ORDER BY m.year'))
-      movieList2 = []
-      for result in cursor:
-        movieList2.append((result.year, result.title, result[2], result[3]))
-      cursor.close()
-      context = dict(movieList2=movieList2, username = userid)
-
-    if sort == 'Sort By Genre':
-      cursor = g.conn.execute(text('Select g.genreName, m.title, m.year, m.movid FROM Movies m, CategorizedBy c, Genres g WHERE m.movid = c.movid AND c.genreid = g.genreid ORDER BY g.genreName'))
-      movieList3 = []
-      for result in cursor:
-        movieList3.append((result[0], result.title, result.year, result[3]))
-      cursor.close()
-      context = dict(movieList3=movieList3, username = userid)
-
   #userid = 'kivi'
+  context = dict(movieList=movieList, username = userid)
   return render_template("browse.html", **context)
-
-
-@app.route('/movieinfo', methods=['GET', 'POST'])
-def movieinfo():
-  userid = session['username']
-
-  movieinfoList = []
-
-  movid = request.args.get('movid')
-  
-  cursor = g.conn.execute(text('Select m.title, m.year, m.length, m.imdbrating from movies m WHERE movid= :movid'), movid = movid)
-
-  for result in cursor:
-    movieinfoList.append((result.title, result.year, result.length, result.imdbrating)) 
-  cursor.close()
-
-  context = dict(movieinfoList=movieinfoList, username = userid)
-  return render_template("movieinfo.html", **context)
-
-@app.route('/artistinfo', methods=['GET', 'POST'])
-def artistinfo():
-  userid = session['username']
-  print "hello"
-  artistinfoList = []
-
-  artistid = request.args.get('artistid')
-
-  cursor = g.conn.execute(text('Select a.artistfirstName, a.artistlastname, a.DOB, a.artistid from Artists a WHERE a.artistid= :artistid'), artistid = artistid)
-
-  for result in cursor:
-    artistinfoList.append((result.artistfirstName, result.artistlastname, result.DOB, result.artistid))  
-  cursor.close()
-
-  context = dict(artistinfoList=artistinfoList, username = userid)
-  return render_template("artistinfo.html", **context)
-  
 
 
 @app.route('/hooray')

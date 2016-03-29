@@ -19,9 +19,9 @@
   <div>
       <table>
 
-      {% for title, rating, movid in rateList %}
+      {% for title, rating in rateList %}
         <tr>
-          <td><a href="movieinfo?movid={{movid}}">{{title}}</a></td><td>:</td><td>{{ rating }}</td>
+          <td>{{ title }}</td><td>{{ rating }}</td>
         </tr>
       {% endfor %}
 

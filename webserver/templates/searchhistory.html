@@ -14,22 +14,35 @@
     <h1>Here are movies you searched!</h1>
   
   
-  <p><b>Search History:</b></p><p></p>
+  <p><b>Search Movie History:</b></p><p></p>
   
   <div>
       <table>
 
-      {% for title, movTimeSearch in searchList %}
+      {% for title, movTimeSearch, movid in searchmovList %}
         <tr>
-          <td>{{ title }}</td><td>{{ movTimeSearch }}</td>
-
+          <td><a href="movieinfo?movid={{movid}}">{{title}}</a></td><td>:</td><td>{{ movTimeSearch }}</td>
         </tr>
       {% endfor %}
 
       </table>
   </div>
-  
-  <p>here</p>
+
+  <h1>Here are artists you searched!</h1>
+
+  <p><b>Search Artist History:</b></p><p></p>
+
+  <div>
+      <table>
+
+      {% for firstNameandlastName, artTimeSearch, artistid in searchartList %}
+        <tr>
+          <td><a href="artistinfo?artistid={{artistid}}">{{firstNameandlastName}}</a></td><td>:</td><td>{{ artTimeSearch }}</td>
+        </tr>
+      {% endfor %}
+
+      </table>
+  </div>
 
 
 </body>

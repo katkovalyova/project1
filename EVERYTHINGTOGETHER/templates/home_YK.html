@@ -1,0 +1,35 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+    <h1>Welcome, {{username}}!</h1>
+  
+  
+  <p><b>Your Queue</b></p><p></p>
+  
+  <div>
+      {% for row in queue %}
+      <div>{{row}}</div>
+      {% endfor %}
+  </div>
+  
+  <p>{{blabla}}</p>
+  <p><a href="/managestreamacc">Manage my streaming accounts.</a></p>
+  
+  <form method="POST" action="/search">
+      <p>Search: <input type="text" name="search">
+          <input type="submit" value="GO"></p>
+  </form>
+      
+
+
+</body>
+
+
+</html>

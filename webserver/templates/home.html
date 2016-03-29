@@ -15,9 +15,9 @@
   <div>
       <table>    <!-- this is to format the table nicely -->
 
-      {% for position, title in queue %}
+      {% for position, title, movid in queue %}
         <tr>
-          <td>{{ position }}</td><td>{{ title }}</td>
+          <td>{{ position }}</td><td><a href="movieinfo?movid={{movid}}">{{title}}</a></td>
         </tr>
       {% endfor %}
 
@@ -32,16 +32,16 @@
   
   <p><a href="/managestreamacc">Manage my streaming accounts.</a></p>
   
-  <form method="POST" action="/search">
+  <form method="POST" action="/search"> 
       <p>Search: <input type="text" name="search">
           <input type="submit" value="GO"></p>
               </form>
 
   <a href="rate">View Rating History</a> <!-- Link to rate.html page -->
   <p>
-  <a href="searchHistory">View Search History</a> <!-- Link to searchHistory page -->
-  <p><b>
-  <a href="browse">Browse Movies Here!</a></b> <!-- Link to general browse page -->
+  <a href="searchhistory">View Search History</a> <!-- Link to searchHistory page -->
+  <p><b><a href="browse">Browse Movies Here!</a></b> <!-- Link to general browse page -->
+  <p> <a href="/watchhistory">View My Watch History</a>
 
 
 
