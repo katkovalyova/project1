@@ -5,6 +5,12 @@
       font-family: arial;
     }
   </style>
+  <style type="text/css">
+  td
+  {
+      padding:0 15px 0 15px;
+  }
+  </style>
 
 
 <body>
@@ -16,12 +22,23 @@
   <p><b>Artist: </b></p><p></p>
   <p></p>
     <div>
-      <p>Artist Name, Date of Birth, and ArtistID</p><p></p>
       <table>
       {% for artistfirstName, artistlastName, DOB, artistid in artistinfoList %}
         <tr>
-          <td><a href="artistinfo?artistid={{artistid}}">{{artistfirstName}}</a></td><td>{{ artistlastName }}</td><td>{{ DOB }}</td>
+          <td><!-- <a href="movieinfo?movid={{movid}}"> -->{{artistfirstName}}</td><td>{{artistlastName}}</td><td>{{ DOB }}</td><td>{{ artistid }}</td>
         </tr>
       {% endfor %}
       </table>
-  </div>
+     </div>
+
+     <div>
+      <!-- <table> -->
+        <p><b>Movies They Are In: </b></p><p></p>
+
+      {% for title, movid in artistinfoList1 %}
+        <tr>
+          <td>{{title}}</td>
+        </tr>
+      {% endfor %}
+      </table>
+    </div></div>

@@ -5,6 +5,12 @@
       font-family: arial;
     }
   </style>
+  <style type="text/css">
+  td
+  {
+      padding:0 15px 0 15px;
+  }
+  </style>
 
 
 <body>
@@ -13,21 +19,21 @@
     <p>
     <h1>Movie Information</h1>
 
-{% for title, year, length, imdbrating in movieinfoList %}
-  <p><b>Movie: <a href="movieinfo?movid={{movid}}">{{title}}</a></b></p><p></p>
+  <p><b>Movie: </b></p><p></p>
   <p></p>
-
 
     <div>
       <table>
 
+      {% for title, year, length, imdbrating, movid in movieinfoList %}
+      <form method="POST" action="/movieinfo"> <input type="submit" name="add" value="Add To Queue">
+        <input type="hidden" name="movid" value="{{ movid }}"></form>
 
-        <!-- <tr><td>Title: <a href="movieinfo?movid={{movid}}">{{title}}</a></td></tr> -->
-        <tr><td>Year: {{ year }}</td></tr>
-        <tr><td>Length: {{ length }} minutes</td></tr>
-        <tr><td>IMDb Rating {{ imdbrating }}</td></tr>
+        <tr>
+          <td><!-- <a href="movieinfo?movid={{movid}}"> -->{{title}}</td><td>{{ year }}</td><td>{{ length }}</td><td>{{ imdbrating }}</td>
+        </tr>
       {% endfor %}
 
       </table>
 
-  </div>
+  </div></div>

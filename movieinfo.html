@@ -1,0 +1,36 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+    <p>Login: {{username}}</p>
+    <p>
+    <p>
+    <h1>Movie Information</h1>
+
+{% for title, year, length, imdbrating in movieinfoList %}
+  <p><b>Movie: <a href="movieinfo?movid={{movid}}">{{title}}</a></b></p><p></p>
+  <p></p>
+
+
+    <div>
+      <table>
+          <form method="POST" action="/movieinfo"> <input type="submit" name="add" value="Add To Queue">
+          <input type="hidden" name="movid" value="{{ movid }}"></form>
+
+        <!-- <tr><td>Title: <a href="movieinfo?movid={{movid}}">{{title}}</a></td></tr> -->
+        <tr><td>Year: {{ year }}</td></tr>
+        <tr><td>Length: {{ length }} minutes</td></tr>
+        <tr><td>IMDb Rating {{ imdbrating }}</td></tr>
+        
+        
+      {% endfor %}
+
+      </table>
+
+  </div>
