@@ -18,7 +18,7 @@ Read about it online.
 import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response, session
+from flask import Flask, request, render_template, g, redirect, Response, session, flash
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -269,6 +269,31 @@ def home():
     return render_template("home.html", **context)
 
 
+@app.route('/removefromqueue', methods=['GET', 'POST'])
+def removefromqueue():
+  try:
+
+    userid = session['username']
+    #print "here\n"
+    position = int(request.form['pos'])
+    print "position = %d\n" % position
+
+    maxqueue = g.conn.execute(text('SELECT max(position) FROM queue WHERE userid = :uid'), uid = userid)
+    maxqueue = maxqueue.fetchone()[0]
+    print "maxqueue = %s\n" % maxqueue
+    g.conn.execute(text('DELETE FROM queue WHERE userid = :uid AND position = :pos'), uid = userid, pos = position)
+
+    while (position < maxqueue):
+      print "in loop\n"
+      g.conn.execute(text('UPDATE queue SET position = :pos where userid = :uid AND position = :pos+1'), pos = position, uid = userid) 
+      position = position + 1
+    
+  except:
+        import traceback; traceback.print_exc()
+  return redirect('/home')
+
+
+
 #
 # KAT
 #
@@ -512,7 +537,6 @@ def browse():
   cursor.close()
   context = dict(movieList=movieList, username = userid)
 
-
   if request.method == 'POST':
     sort = request.form['sort']
     if sort == 'Sort By Title':
@@ -584,6 +608,17 @@ def artistinfo():
 
   return render_template("artistinfo.html", **context)
   
+
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+  try:
+    session.pop('username')
+    #flash('You were logged out')
+  except:
+    import traceback; traceback.print_exc()  
+    
+  return redirect('/')
 
 
 @app.route('/hooray')

@@ -17,7 +17,10 @@
 
       {% for position, title, movid in queue %}
         <tr>
-          <td>{{ position }}</td><td><a href="movieinfo?movid={{movid}}">{{title}}</a></td>
+            <form method="POST" action="/removefromqueue">
+          <td>{{ position }}. </td><td><a href="movieinfo?movid={{movid}}">{{title}}</a></td>
+          <input type="hidden" value="{{ position }}" name="pos">
+          <td><input type="submit" value="Remove from queue"></form></td>
         </tr>
       {% endfor %}
 
@@ -42,8 +45,10 @@
   <a href="searchhistory">View Search History</a> <!-- Link to searchHistory page -->
   <p><b><a href="browse">Browse Movies Here!</a></b> <!-- Link to general browse page -->
   <p> <a href="/watchhistory">View My Watch History</a>
-
-
+  
+  <p><p><p>
+  
+  <p> <form method="POST" action="/logout"><input type="submit" value="Logout"></p></form>
 
 </body>
 
