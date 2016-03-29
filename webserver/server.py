@@ -317,34 +317,73 @@ def browse():
 @app.route('/movieinfo', methods=['GET', 'POST'])
 def movieinfo():
   userid = session['username']
+
   movieinfoList = []
+
   movid = request.args.get('movid')
-  cursor = g.conn.execute(text('Select m.title, m.year, m.length, m.imdbrating from movies m WHERE movid= :movid'), movid = movid)
+
+  cursor = g.conn.execute(text('Select m.title, m.year, m.length, m.imdbrating, m.movid from movies m WHERE movid= :movid'), movid = movid)
 
   for result in cursor:
-    movieinfoList.append((result.title, result.year, result.length, result.imdbrating)) 
+    movieinfoList.append((result.title, result.year, result.length, result.imdbrating, result.movid)) 
   cursor.close()
 
+
+  if request.method == 'POST':
+    add = request.form['add']
+    if add == 'Add To Queue':
+      try: 
+        movid = request.form['movid']
+        print "movid = %s\n" % movid
+
+        print "hope this shows up"
+        import datetime;  
+        date = datetime.date.today()
+        maxPos = g.conn.execute(text('SELECT max(position) FROM Queue q  WHERE q.userid= :userid'), userid = userid)
+        newmax = maxPos.fetchone()[0] + 1
+      
+        # print "movid = %s\n" % movid
+        g.conn.execute(text('insert into queue values (:userid, :movid, :newmax, :date)'), userid=userid, movid=movid, newmax=newmax, date = date)
+      except:
+        import traceback; traceback.print_exc()
+      return redirect("/home") 
+
   context = dict(movieinfoList=movieinfoList, username = userid)
+
   return render_template("movieinfo.html", **context)
+
+
+
 
 @app.route('/artistinfo', methods=['GET', 'POST'])
 def artistinfo():
-  try:
-    userid = session['username']
-    print "hello"
-    artistinfoList = []
-    artistid = request.args.get('artistid')
-    #print "artistid = %s\n" % artistid
+  userid = session['username']
+  print "hello"
 
-    cursor = g.conn.execute(text('Select a.artistfirstName, a.artistlastname, a.DOB, a.artistid from Artists a WHERE a.artistid= :artistid'), artistid = artistid)
+  try:
+    artistinfoList = []
+
+    artistid = request.args.get('artistid')
+
+    cursor = g.conn.execute(text('Select a.artistfirstName, a.artistlastname, a.dob, a.artistid FROM Artists a WHERE a.artistid= :artistid'), artistid = artistid)
+    for result in cursor:
+      artistinfoList.append((result[0], result[1], result.dob, result.artistid))  
+    cursor.close()
+
+    artistinfoList1 = []
+
+    cursor = g.conn.execute(text('Select m.title, m.movid from Starredin s, Movies m WHERE s.artistid = :artistid AND m.movid = s.movid'), artistid = artistid)
 
     for result in cursor:
-      artistinfoList.append((result.artistfirstname, result.artistlastname, result.dob, result.artistid))  
+      artistinfoList1.append((result.title, result.movid))  
+
+    for result in artistinfoList1:
+      print result
+      
     cursor.close()
   except:
     import traceback; traceback.print_exc()
-  context = dict(artistinfoList=artistinfoList, username = userid)
+  context = dict(artistinfoList=artistinfoList, artistinfoList1=artistinfoList1, username = userid)
   return render_template("artistinfo.html", **context)
   
 @app.route('/logout', methods=['GET', 'POST'])
