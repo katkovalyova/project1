@@ -343,10 +343,12 @@ def movieinfo():
       import datetime;  
       date = datetime.date.today()
       maxPos = g.conn.execute(text('SELECT max(position) FROM Queue q  WHERE q.userid= :userid'), userid = userid)
-      newmax = maxPos.fetchone()[0] + 1
-    
-      # print "movid = %s\n" % movid
-      g.conn.execute(text('insert into queue values (:userid, :movid, :newmax, :date)'), userid=userid, movid=movid, newmax=newmax, date = date)
+      maxPos = maxPos.fetchone()[0]
+      if maxPos:          
+        newmax = maxPos + 1
+        g.conn.execute(text('insert into queue values (:userid, :movid, :newmax, :date)'), userid=userid, movid=movid, newmax=newmax, date = date)
+      else:
+        g.conn.execute(text('insert into queue values (:userid, :movid, 1, :date)'), userid=userid, movid=movid, date = date)  
     return redirect("/home") 
 
   import datetime;  
