@@ -32,6 +32,12 @@
         <tr>
           <td><!-- <a href="movieinfo?movid={{movid}}"> -->{{title}}</td><td>{{ year }}</td><td>{{ length }}</td><td>{{ imdbrating }}</td>
         </tr>
+        
+        <form method="POST" action="/ratemov">
+        <p>Rate: <input type="text" name="rating">
+            <input type="submit" value="GO"></p>
+                <input type="hidden" name="movid" value="{{ movid }}"></form>
+                </form>
       {% endfor %}
 
       </table>

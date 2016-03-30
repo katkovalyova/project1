@@ -202,7 +202,22 @@ def replacestreamacc():
   except:
     import traceback; traceback.print_exc()
   return redirect('/managestreamacc')
-  
+ 
+
+@app.route('/ratemov', methods=['GET', 'POST'])
+def ratemov():
+  userid = session['username']
+  rating = request.form['rating']
+  rating = float(rating)
+  movid = request.form['movid']
+  currate = g.conn.execute(text('SELECT value FROM rate WHERE userid = :uid AND movid = :mid'), uid = userid, mid = movid)
+  currate = currate.fetchone()
+  if currate:
+    g.conn.execute(text('UPDATE rate SET value = :v WHERE userid = :uid AND movid = :mid'), v = rating, uid = userid, mid = movid)
+  else:
+    g.conn.execute(text('INSERT INTO rate VALUES (:uid, :mid, :v)'), uid = userid, mid = movid, v = rating)
+  return redirect('/home')
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
   originput = request.form['search']
