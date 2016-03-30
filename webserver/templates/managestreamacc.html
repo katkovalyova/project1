@@ -9,12 +9,12 @@
 
 <body>
     <h1>{{username}}'s Streaming Accounts!</h1>
-  
+    
   <div>
       {% for row in accounts %}
-       <form method="POST" action="/editstreamacc"> <div>{{row[0]}}: {{row[1]}}
-          <input type="submit" value="Update" name="manage" action="/deletestreamacc"><!-- action="updatestreamacc"> -->
-              <input type="submit" value="Delete" name="manage" action="/updatestreamacc"></div><!-- action="deletestreamacc"> --></div>
+       <form method="POST" action="/editstreamacc"> {{row[0]}}: {{row[1]}}
+          <input type="submit" value="Update" name="manage" action="/updatestreamacc"><!-- action="updatestreamacc"> -->
+              <input type="submit" value="Delete" name="manage" action="/deletestreamacc"><!-- action="deletestreamacc"> -->
       <input type="hidden" name="exaccid" value="{{row[2]}}">  </form>
       
       {% endfor %}

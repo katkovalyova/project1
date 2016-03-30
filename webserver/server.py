@@ -167,15 +167,19 @@ def deletestreamacc():
   g.conn.execute(text('DELETE FROM externalaccounts WHERE extaccid = :eid'), eid = exaccid)
   return redirect('/managestreamacc')
 
-@app.route('/editstreamacc', methods=['POST'])
+@app.route('/editstreamacc', methods=['GET', 'POST'])
 def editstreamacc():
   userid = session['username']
   exaccid = request.form['exaccid']
+  
   manage = request.form['manage']
-  if manage == 'Delete':   
+  if manage == 'Delete':
+    exaccid = request.form['exaccid']   
     g.conn.execute(text('DELETE FROM externalaccounts WHERE extaccid = :eid'), eid = exaccid)
     return redirect('/managestreamacc')
   if manage == 'Update':
+    exaccid = request.form['exaccid']
+    print "edit account id = %s \n" % exaccid
     cursor = g.conn.execute(text('SELECT x.extservname FROM servedby s, externalservices x where s.extaccid = :eid and s.extservid = x.extservid'), eid = exaccid)
     esname = cursor.fetchone()
     context = dict(exaccid = exaccid, esname = esname)
@@ -184,13 +188,19 @@ def editstreamacc():
 
 @app.route('/replacestreamacc', methods=['GET', 'POST'])
 def replacestreamacc():
-  print "in function\n"
-  userid = session['username']
-  exaccid = request.form['exaccid']
-  esname = request.form['esname']
-  exaccun = request.form['exaccun']
-  exaccpw = request.form['exaccpw']
-  g.conn.execute(text('UPDATE externalaccounts SET extaccun = :eun, extaccpw = :pw where extaccid = :id'), eun = exaccun, pw = exaccpw, id = exaccid)
+  try:
+    userid = session['username']
+    exaccid = request.form['exaccid']
+    esname = request.form['esname']
+    exaccun = request.form['exaccun']
+    exaccpw = request.form['exaccpw']
+    print "exaccid = %s\n" % exaccid
+    print "esname = %s\n" % esname
+    print "exaccun = %s\n" %exaccun
+    print "exaccpw = %s\n" %exaccpw
+    g.conn.execute(text('UPDATE externalaccounts SET extaccun = :eun, extaccpw = :pw where extaccid = :id'), eun = exaccun, pw = exaccpw, id = exaccid)
+  except:
+    import traceback; traceback.print_exc()
   return redirect('/managestreamacc')
   
 @app.route('/search', methods=['GET', 'POST'])
